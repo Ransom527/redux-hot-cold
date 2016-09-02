@@ -4,14 +4,17 @@ var initialState = {
     guesses: [],
     feedback: 'Make your guess!',
     correctAnswer: Math.round(Math.random() * 100),
-    showInfoModal: false
+    showInfoModal: false,
+    fewestGuesses: null
 };
 
 var reducer = function(state, action) {
     state = state || initialState;
     if (action.type === actions.NEW_GAME) {
-        state = Object.assign({}, initialState, {
-            correctAnswer: Math.round(Math.random() * 100)
+        state = Object.assign({
+        }, initialState, {
+            fewestGuesses: state.fewestGuesses,
+            correctAnswer: action.correctAnswer
         });
         return state;
     }
@@ -57,6 +60,18 @@ var reducer = function(state, action) {
         });
         return state;
     }
+    else if (action.type === actions.FETCH_FEWEST_GUESSES_SUCCESS) {
+         state = Object.assign({}, state, {
+             fewestGuesses: action.guesses
+        });
+        return state;
+    }
+    else if (action.type === actions.FETCH_FEWEST_GUESSES_ERROR) {
+        // TODO: Handle properly
+        console.error(action.error);
+        return state;
+    }
+
 
     return state;
 };

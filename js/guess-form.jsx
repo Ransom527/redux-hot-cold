@@ -6,7 +6,21 @@ var actions = require('./actions');
 var GuessForm = React.createClass({
     submitGuess: function(event) {
         event.preventDefault();
+        var value = this.refs.input.value;
         this.props.dispatch(actions.makeGuess(this.refs.input.value));
+
+        if (parseInt(value, 10) === this.props.correctAnswer &&
+            (!this.props.fewestGuesses ||
+             this.props.guessCount < this.props.fewestGuesses)) {
+            var guesses = this.props.guessCount + 1;
+            this.props.dispatch(
+                actions.saveFewestGuesses(guesses)
+            ).then(function() {
+                return this.props.dispatch(
+                    actions.fetchFewestGuesses()
+                );
+            }.bind(this));
+        }
     },
     render: function() {
         return (
@@ -18,6 +32,14 @@ var GuessForm = React.createClass({
     }
 });
 
-var Container = connect()(GuessForm);
+var mapStateToProps = function(state) {
+    return {
+        guessCount: state.guesses.length,
+        fewestGuesses: state.fewestGuesses,
+        correctAnswer: state.correctAnswer
+    };
+};
+
+var Container = connect(mapStateToProps)(GuessForm);
 
 module.exports = Container;
